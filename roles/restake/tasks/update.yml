@@ -1,0 +1,5 @@
+---
+- name: Copy networks.local.json
+  copy:
+    src: "{{ role_path }}/files/networks.local.json"
+    dest: "{{ src_path }}/src/networks.local.json"

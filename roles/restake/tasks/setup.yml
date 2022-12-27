@@ -1,0 +1,88 @@
+---
+- name: Install packages
+  apt:
+    pkg:
+      - apt-transport-https
+      - ca-certificates
+      - gnupg
+      - lsb-release
+      - python3-pip
+
+- name: Delete existing docker gpg key
+  file:
+    path: /usr/share/keyrings/docker-archive-keyring.gpg
+    state: absent
+
+- name: Add docker gpg key
+  shell: curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+- name: Configure docker repository
+  shell: |
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] \
+    https://download.docker.com/linux/debian $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+- name: Install the docker python library
+  shell: pip3 install docker
+
+- name: Upgrade packages
+  apt:
+    upgrade: "yes"
+    update_cache: "yes"
+
+- name: Install docker
+  apt:
+    pkg:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+
+- name: Start docker
+  command: echo "starting docker"
+  notify: "start docker"
+
+- name: Checkout the repository
+  become_user: "{{ user }}"
+  git:
+    repo: "{{ repository_url }}"
+    dest: "{{ src_path }}"
+    update: yes
+    force: yes
+    recursive: no
+
+- name: Add the mnemonic
+  become_user: "{{ user }}"
+  copy:
+    dest: "{{ src_path }}/.env"
+    content: |
+      MNEMONIC={{ mnemonic }}
+
+- name: Copy restake.service
+  template:
+    src: restake.service.j2
+    dest: /etc/systemd/system/restake.service
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Copy restake.timer
+  copy:
+    src: "{{ role_path }}/files/restake.timer"
+    dest: /etc/systemd/system/restake.timer
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Set restake to start on boot
+  systemd:
+    name: restake.timer
+    enabled: yes
+    masked: no
+
+- name: Copy networks.local.json
+  copy:
+    src: "{{ role_path }}/files/networks.local.json"
+    dest: "{{ src_path }}/src/networks.local.json"
+
+- name: Restart restake.timer
+  command: echo "restarting restake.timer"
+  notify: "restart restake.timer"

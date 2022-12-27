@@ -1,0 +1,6 @@
+---
+- include: setup.yml
+  when: mnemonic is defined
+
+- include: update.yml
+  when: mnemonic is not defined

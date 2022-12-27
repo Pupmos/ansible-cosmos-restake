@@ -1,0 +1,14 @@
+[Unit]
+Description=stakebot service with docker compose
+Requires=docker.service
+After=docker.service
+Wants=restake.timer
+
+[Service]
+Type=oneshot
+User={{ user }}
+WorkingDirectory={{ src_path }}
+ExecStart=sudo /usr/local/bin/docker-compose run --rm app npm run autostake
+
+[Install]
+WantedBy=multi-user.target

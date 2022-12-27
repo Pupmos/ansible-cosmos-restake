@@ -1,0 +1,7 @@
+- name: Launch
+  hosts: "{{ target }}"
+  become: true
+  roles:
+    - restake
+  vars:
+    node_type: restake

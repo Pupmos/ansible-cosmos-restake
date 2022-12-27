@@ -1,0 +1,3 @@
+.DS_Store
+inventory/hosts
+roles/restake/files/networks.local.json
