@@ -1,6 +1,6 @@
-# Ansible
+# Pupmos/ansible-cosmos-restake
 
-An ansible playbook for restake.app on Cosmos.
+An Ansible playbook for restake.app on Cosmos.
 
 ## Prerequisites
 
@@ -13,9 +13,7 @@ _Ideally ansible should be installed via [pip](https://pip.pypa.io/en/stable/), 
 
 This README assumes that you've already installed `debian` or `ubuntu` onto the target environment/s.
 
-## Ansible
-
-### Setup
+## Setup
 
 1. Install the required git submodule dependencies:
 
